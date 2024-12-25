@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Golf Scorecard - Home</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Roboto", sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: #002800;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1,
+        h2 {
+            margin: 0;
+            font-weight: 400;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 10px;
+        }
+
+        .score-submission,
+        .recent-scores {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .score-submission h2,
+        .recent-scores h2 {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            color: #202124;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section {
+            text-align: center;
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #5f6368;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            font-size: 1rem;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease-in-out;
+            background: #fff;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #002800;
+            scroll-margin-top: 350px;
+        }
+
+        .error-message {
+            color: #d93025;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        button[type="submit"] {
+            background: #002800;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease-in-out;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background: #004000;
+        }
+
+        /* -- Make the holes a single row using a grid, each cell is one "hole" -- */
+        .holes-inputs {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            /* Create 9 equal columns */
+            margin-top: 20px;
+            border: 2px solid #67796b;
+            /* Pink border for high contrast */
+            border-radius: 8px;
+            /* Matches the button's rounded corners */
+            overflow: hidden;
+            /* Ensures inner elements stay within the rounded corners */
+        }
+
+        .hole-box {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            border-left: 2px solid #67796b;
+            overflow: hidden;
+        }
+
+        .hole-box:first-child {
+            border-left: none;
+        }
+
+        .hole-box select {
+            -webkit-appearance: none;
+            /* Remove default dropdown styling */
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            text-align: center;
+            /* Center text horizontally */
+            text-align-last: center;
+            /* Ensures dropdown selected text is centered */
+            font-size: 1.2rem;
+            /* Adjust font size for better visual balance */
+            padding: 8px 0;
+            /* Adds vertical padding for centering */
+            width: 100%;
+            background-color: #fff;
+            outline: none;
+            cursor: pointer;
+            color: #002800;
+            box-sizing: border-box;
+        }
+
+        .hole-box select:focus {
+            outline: 2px solid #67796b;
+            /* Highlight when focused */
+        }
+
+        .hole-box .hole-label {
+            background: #002800;
+            color: #fff;
+            font-weight: bold;
+            padding: 10px 0;
+            border-bottom: 2px solid #67796b;
+        }
+
+
+        footer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        footer a {
+            color: #002800;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Moss Hill</h1>
+        <nav style="margin-top: 10px;">
+            <a href="index.html" style="color: #fff; text-decoration: none; margin-right: 20px;">Scorecard</a>
+            <a href="data.html" style="color: #fff; text-decoration: none;">Course Data</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="score-submission">
+            <form id="scoreForm">
+                <div class="section" id="overallAveragesSection">
+                    <label for="playerName">Player Name</label>
+                    <input type="text" id="playerName" name="playerName" required>
+                </div>
+
+                <!-- Course map -->
+                <div>
+                    <img id="courseMap" src="assets/all.png" alt="course map"
+                        style="width: 100%; height: auto; max-height: 300px; object-fit: contain; border-radius: 8px;" />
+                </div>
+
+                <!-- Single grid row for holes -->
+                <div class="holes-inputs">
+                    <div class="hole-box">
+                        <div class="hole-label">1</div>
+                        <select id="hole1" name="hole1" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="hole-box">
+                        <div class="hole-label">2</div>
+                        <select id="hole2" name="hole2" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="hole-box">
+                        <div class="hole-label">3</div>
+                        <select id="hole3" name="hole3" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="hole-box">
+                        <div class="hole-label">4</div>
+                        <select id="hole4" name="hole4" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="hole-box">
+                        <div class="hole-label">5</div>
+                        <select id="hole5" name="hole5" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="hole-box">
+                        <div class="hole-label">6</div>
+                        <select id="hole6" name="hole6" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="hole-box">
+                        <div class="hole-label">7</div>
+                        <select id="hole7" name="hole7" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="hole-box">
+                        <div class="hole-label">8</div>
+                        <select id="hole8" name="hole8" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="hole-box">
+                        <div class="hole-label">9</div>
+                        <select id="hole9" name="hole9" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="error-message" id="errorMessage"></div>
+                <button type="submit">Submit Score</button>
+            </form>
+        </section>
+
+        <!-- <section class="recent-scores">
+            <h2>Leaderboard</h2>
+            <div id="Leaderboard"></div>
+        </section>
+
+        <section class="recent-scores">
+            <h2>Recent Scores</h2>
+            <div id="recentScores"></div>
+        </section> -->
+    </main>
+
+    <!-- <footer>
+        <p><a href="data.html">View Averages</a></p>
+    </footer> -->
+
+    <script>
+        document.querySelectorAll('input[type="number"]').forEach((input) => {
+            input.addEventListener('focus', () => {
+                const inputOffset = input.getBoundingClientRect().top + window.pageYOffset - 200; // Adjust 200px above
+                window.scrollTo({
+                    top: inputOffset,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const errorMessage = document.getElementById('errorMessage');
+            const scoreForm = document.getElementById('scoreForm');
+            const recentScoresDiv = document.getElementById('recentScores');
+            const inputs = document.querySelectorAll('.holes-inputs input');
+            const courseMap = document.getElementById('courseMap');
+            const form = document.getElementById('scoreForm');
+
+            if (scoreForm) {
+                scoreForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    errorMessage.textContent = '';
+
+                    const formData = new FormData(scoreForm);
+
+                    // Validate all fields
+                    for (let [name, value] of formData.entries()) {
+                        if (!value && name !== 'playerName') {
+                            errorMessage.textContent = 'Please fill all fields correctly.';
+                            return;
+                        }
+                        if (name.startsWith('hole')) {
+                            const score = parseInt(value);
+                            if (isNaN(score) || score < 1 || score > 5) {
+                                errorMessage.textContent = 'Scores must be between 1 and 5.';
+                                return;
+                            }
+                        }
+                    }
+
+                    const urlParams = new URLSearchParams();
+                    for (let [key, value] of formData.entries()) {
+                        urlParams.append(key, value);
+                    }
+
+                    const response = await fetch('server.py', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: urlParams
+                    });
+
+                    const result = await response.text();
+                    if (result.trim() === 'success') {
+                        scoreForm.reset();
+                        loadRecentScores();
+                    } else {
+                        errorMessage.textContent = 'Error submitting score.';
+                    }
+                });
+
+                async function loadRecentScores() {
+                    const response = await fetch('server.py?action=get_recent_scores');
+                    const text = await response.text();
+                    const lines = text.trim().split('\n').filter(line => line);
+                    recentScoresDiv.innerHTML = '';
+
+                    const table = document.createElement('table');
+                    table.style.width = '100%';
+                    table.style.borderCollapse = 'collapse';
+
+                    const thead = document.createElement('thead');
+                    const headerRow = document.createElement('tr');
+                    const headers = ['Holes', 'Total', 'Date', 'Player'];
+                    headers.forEach(h => {
+                        const th = document.createElement('th');
+                        th.textContent = h;
+                        th.style.textAlign = 'left';
+                        th.style.borderBottom = '1px solid #ccc';
+                        th.style.padding = '8px';
+                        headerRow.appendChild(th);
+                    });
+                    thead.appendChild(headerRow);
+
+                    const tbody = document.createElement('tbody');
+
+                    lines.reverse().forEach(line => {
+                        const parts = line.split(',');
+                        // [datetime, hole1..hole9, player]
+                        const datetime = parts[0];
+                        const holes = parts.slice(1, 10);
+                        const player = parts[10];
+                        const total = holes.reduce((sum, h) => sum + parseInt(h), 0);
+
+                        const [datePart] = datetime.split(' ');
+                        const [year, month, day] = datePart.split('-');
+                        const shortYear = year.slice(-2);
+                        const formattedDate = `${month}/${day}/${shortYear}`;
+
+                        const row = document.createElement('tr');
+
+                        const holesCell = document.createElement('td');
+                        holesCell.textContent = holes.join(' ');
+                        holesCell.style.padding = '8px';
+                        row.appendChild(holesCell);
+
+                        const totalCell = document.createElement('td');
+                        totalCell.textContent = total;
+                        totalCell.style.padding = '8px';
+                        row.appendChild(totalCell);
+
+                        const dateCell = document.createElement('td');
+                        dateCell.textContent = formattedDate;
+                        dateCell.style.padding = '8px';
+                        row.appendChild(dateCell);
+
+                        const playerCell = document.createElement('td');
+                        playerCell.textContent = player;
+                        playerCell.style.padding = '8px';
+                        row.appendChild(playerCell);
+
+                        tbody.appendChild(row);
+                    });
+
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+                    recentScoresDiv.appendChild(table);
+                }
+                loadRecentScores();
+            }
+
+            // Hole focus -> change courseMap image
+            // // Add 'change' event listeners for all dropdowns to update the courseMap image
+            // document.querySelectorAll('.holes-inputs select').forEach((select, index) => {
+            //     select.addEventListener('change', () => {
+            //         // Update the image based on the selected hole
+            //         document.getElementById('courseMap').src = `assets/${index + 1}.png`;
+            //     });
+
+            //     // Add focus event for better user interaction on mobile devices
+            //     select.addEventListener('focus', () => {
+            //         document.getElementById('courseMap').src = `assets/${index + 1}.png`;
+            //     });
+            // });
+
+            // // Revert back to the default map image when focus is lost from all dropdowns
+            // document.getElementById('scoreForm').addEventListener('focusout', () => {
+            //     setTimeout(() => {
+            //         if (!document.activeElement.closest('.holes-inputs')) {
+            //             document.getElementById('courseMap').src = 'assets/all.png';
+            //         }
+            //     }, 0);
+            // });
+
+            // Function to update the course map based on the first unselected hole
+            function updateCourseMap() {
+                const selects = document.querySelectorAll('.holes-inputs select');
+                let firstUnselectedHole = null;
+
+                // Find the first hole without a selected score
+                selects.forEach((select, index) => {
+                    if (!select.value && firstUnselectedHole === null) {
+                        firstUnselectedHole = index + 1; // Hole numbers start at 1
+                    }
+                });
+
+                // Update the course map image
+                const courseMap = document.getElementById('courseMap');
+                if (firstUnselectedHole) {
+                    courseMap.src = `assets/${firstUnselectedHole}.png`;
+                } else {
+                    courseMap.src = 'assets/all.png'; // Show the default map if all holes are completed
+                }
+            }
+
+            // Add event listeners to all dropdowns to trigger the update
+            document.querySelectorAll('.holes-inputs select').forEach((select) => {
+                select.addEventListener('change', updateCourseMap);
+                select.addEventListener('focus', updateCourseMap);
+            });
+
+            // Initial update when the page loads
+            updateCourseMap();
+
+
+
+            // Revert to all.png if no hole input is focused
+            form.addEventListener('focusout', () => {
+                setTimeout(() => {
+                    // Ensure no dropdown is focused and only reset if no unselected hole is found
+                    const activeElement = document.activeElement;
+                    const selects = document.querySelectorAll('.holes-inputs select');
+                    let anyUnselected = false;
+
+                    selects.forEach((select) => {
+                        if (!select.value) {
+                            anyUnselected = true;
+                        }
+                    });
+
+                    if (!activeElement.closest('.holes-inputs') && !anyUnselected) {
+                        courseMap.src = 'assets/all.png';
+                    }
+                }, 200);
+            });
+
+
+            // Load the leaderboard
+            async function loadLeaderboard() {
+                const response = await fetch('server.py?action=get_leaderboard');
+                const text = await response.text();
+                const lines = text.trim().split('\n').filter(line => line);
+
+                const leaderboardDiv = document.getElementById('Leaderboard');
+                leaderboardDiv.innerHTML = '';
+
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                const headers = ['Holes', 'Total', 'Date', 'Player'];
+                headers.forEach(h => {
+                    const th = document.createElement('th');
+                    th.textContent = h;
+                    th.style.textAlign = 'left';
+                    th.style.borderBottom = '1px solid #ccc';
+                    th.style.padding = '8px';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+
+                const tbody = document.createElement('tbody');
+
+                lines.forEach((line, index) => {
+                    const parts = line.split(',');
+                    if (parts.length < 12) return;
+
+                    const datetime = parts[0];
+                    const holes = parts.slice(1, 10);
+                    const total = parts[10];
+                    const player = parts[11];
+
+                    const [datePart] = datetime.split(' ');
+                    const [year, month, day] = datePart.split('-');
+                    const shortYear = year.slice(-2);
+                    const formattedDate = `${month}/${day}/${shortYear}`;
+
+                    const row = document.createElement('tr');
+
+                    // Simple color highlight for top 3
+                    if (index === 0) {
+                        row.style.backgroundColor = '#FFF4CC';
+                    } else if (index === 1) {
+                        row.style.backgroundColor = '#F0F0F0';
+                    } else if (index === 2) {
+                        row.style.backgroundColor = '#F7E9E0';
+                    }
+
+                    const holesCell = document.createElement('td');
+                    holesCell.textContent = holes.join(' ');
+                    holesCell.style.padding = '8px';
+                    row.appendChild(holesCell);
+
+                    const totalCell = document.createElement('td');
+                    totalCell.textContent = total;
+                    totalCell.style.padding = '8px';
+                    row.appendChild(totalCell);
+
+                    const dateCell = document.createElement('td');
+                    dateCell.textContent = formattedDate;
+                    dateCell.style.padding = '8px';
+                    row.appendChild(dateCell);
+
+                    const playerCell = document.createElement('td');
+                    playerCell.textContent = player;
+                    playerCell.style.padding = '8px';
+                    row.appendChild(playerCell);
+
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(thead);
+                table.appendChild(tbody);
+                leaderboardDiv.appendChild(table);
+            }
+            loadLeaderboard();
+        });
+    </script>
+</body>
+
+</html>

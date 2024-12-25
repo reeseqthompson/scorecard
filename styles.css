@@ -1,0 +1,111 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f6f2;
+    color: #333;
+}
+
+header,
+footer {
+    background: #2e7d32;
+    color: #fff;
+    text-align: center;
+    padding: 1em;
+}
+
+main {
+    padding: 1em;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+h1,
+h2 {
+    margin: 0.5em 0;
+}
+
+.score-submission,
+.recent-scores,
+.filter-section,
+.averages-display {
+    background: #fff;
+    padding: 1em;
+    margin-bottom: 1em;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group,
+.hole-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5em;
+}
+
+.holes-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.5em;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 0.2em;
+}
+
+input[type=text],
+input[type=number] {
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background: #2e7d32;
+    color: #fff;
+    padding: 0.7em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1b5e20;
+}
+
+.error-message {
+    color: #d32f2f;
+    margin-bottom: 1em;
+}
+
+.recent-scores,
+.averages-display {
+    font-size: 0.9em;
+}
+
+.recent-scores div.score-card,
+.averages-display div.hole-average {
+    background: #e8f5e9;
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.averages-display h2,
+.recent-scores h2 {
+    margin-top: 0;
+}
+
+.filter-section form {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    flex-wrap: wrap;
+}
+
+#averagesContainer .hole-average {
+    display: flex;
+    justify-content: space-between;
+}
