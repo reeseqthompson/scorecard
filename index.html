@@ -193,7 +193,7 @@
 
 <body>
     <header>
-        <h1>Moss Hill</h1>
+        <h1>Moss Hill Golf Club</h1>
         <nav style="margin-top: 10px;">
             <a href="index.html" style="color: #fff; text-decoration: none; margin-right: 20px;">Scorecard</a>
             <a href="data.html" style="color: #fff; text-decoration: none;">Course Data</a>
@@ -385,6 +385,8 @@
                     for (let [key, value] of formData.entries()) {
                         urlParams.append(key, value);
                     }
+                    urlParams.append('action', 'submit_score');
+
 
                     const response = await fetch('server.py', {
                         method: 'POST',
