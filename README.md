@@ -3,6 +3,12 @@
 A golf scorecard app for the Moss Hill basement course. It records
 nine-hole rounds and displays playing history, statistics, and a leaderboard.
 
+## Screenshots
+
+| Home | New round | Scorecard | Playing history | Statistics |
+| --- | --- | --- | --- | --- |
+| ![Home screen](screenshots/home.jpg) | ![New round setup](screenshots/setup.jpg) | ![Scorecard](screenshots/scorecard.jpg) | ![Playing history](screenshots/history.jpg) | ![Statistics and leaderboard](screenshots/statistics.jpg) |
+
 ## Requirements
 
 - Python 3
