@@ -43,6 +43,7 @@ http://192.168.x.x:3001/
 - **Basement Golf League:** Open `/v3/index.html` for the league homepage and
   course designer. The league homepage links to the default scorecard.
 
+To return to V2 from V1, open Course Data and use the link at the bottom.
 Both scorecard versions use the same server and Moss Hill score data. Save any
 in-progress round before switching interfaces. The course designer has separate
 device and HTTPS requirements; see its README.
