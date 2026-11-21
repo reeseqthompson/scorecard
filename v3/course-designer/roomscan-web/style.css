@@ -1,0 +1,8 @@
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; color: #fff; font-family: system-ui, sans-serif; }
+.overlay { position: fixed; left: 0; right: 0; bottom: env(safe-area-inset-bottom); padding: 8px; z-index: 10; }
+.overlay .row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+button { background: #1f2937; color: #fff; border: 1px solid #374151; padding: 8px 12px; border-radius: 8px; }
+button:active { filter: brightness(1.2); }
+#status { text-align: center; margin-top: 8px; font-size: 12px; opacity: 0.9; }
+
+#plan2d { position: fixed; right: 8px; bottom: calc(56px + env(safe-area-inset-bottom)); width: 280px; height: 220px; background: rgba(17,17,17,0.85); border: 1px solid #374151; border-radius: 8px; }

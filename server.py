@@ -2,6 +2,7 @@
 import http.server
 import urllib.parse
 import os
+import mimetypes
 from datetime import datetime
 
 HOST = '0.0.0.0'
@@ -77,14 +78,8 @@ class SimpleRequestHandler(http.server.BaseHTTPRequestHandler):
 
             if os.path.isfile(file_path):
                 self.send_response(200)
-                if file_path.endswith('.html'):
-                    self.send_header('Content-Type', 'text/html')
-                elif file_path.endswith('.css'):
-                    self.send_header('Content-Type', 'text/css')
-                elif file_path.endswith('.js'):
-                    self.send_header('Content-Type', 'application/javascript')
-                else:
-                    self.send_header('Content-Type', 'text/plain')
+                content_type = mimetypes.guess_type(file_path)[0] or 'application/octet-stream'
+                self.send_header('Content-Type', content_type)
                 self.end_headers()
                 with open(file_path, 'rb') as f:
                     self.wfile.write(f.read())

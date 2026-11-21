@@ -1,0 +1,10 @@
+{
+  "courses": [
+    {
+      "name": "Moss Hill Golf Club",
+      "folder": "moss-hill-golf-club",
+      "description": "9-hole basement golf course",
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Golf Scorecard - Home</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #2d5a47 0%, #3d6b58 25%, #2d6b4f 50%, #3d7b5f 75%, #2d5a47 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            color: #333;
+            min-height: 100vh;
+            height: 100%;
+            position: relative;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(102, 187, 106, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(129, 199, 132, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            background: rgba(46, 88, 72, 0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(102, 187, 106, 0.3);
+            color: #fff;
+            padding: 15px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        /* Desktop: Constrain header content width */
+        @media screen and (min-width: 769px) {
+            header {
+                max-width: 490px;
+                width: min(490px, 100%);
+                margin-left: auto;
+                margin-right: auto;
+                border-radius: 0 0 24px 24px;
+            }
+        }
+
+        h1,
+        h2 {
+            margin: 0;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-logo {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-logo img {
+            height: 90px;
+            width: auto;
+            max-width: 120px;
+            background: transparent;
+            mix-blend-mode: multiply;
+            filter: brightness(1.1);
+        }
+
+        /* Remove white background from logo */
+        .header-logo {
+            background: transparent;
+        }
+
+        .header-logo h1 {
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+
+        .header-nav-left {
+            justify-content: flex-end;
+            padding-right: 10px;
+        }
+
+        .header-nav-right {
+            justify-content: flex-start;
+            padding-left: 10px;
+        }
+
+        header nav a {
+            color: rgba(255, 255, 255, 0.95);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 8px 0;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        header nav a:hover {
+            color: rgba(255, 255, 255, 1);
+            transform: translateY(-1px);
+        }
+
+        header nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: rgba(156, 204, 101, 0.9);
+            transition: width 0.3s ease;
+        }
+
+        header nav a:hover::after {
+            width: 100%;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 10px;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        /* Desktop: Constrain content width and center it */
+        @media screen and (min-width: 769px) {
+            main {
+                max-width: 450px;
+                width: min(450px, 100%);
+                margin-left: auto;
+                margin-right: auto;
+                padding: 0 20px;
+            }
+
+            .score-submission,
+            .recent-scores {
+                max-width: 100%;
+            }
+        }
+
+        /* Very large screens: Keep content narrow and centered */
+        @media screen and (min-width: 1200px) {
+            main {
+                max-width: 450px;
+                width: min(450px, 100%);
+            }
+        }
+
+        .score-submission,
+        .recent-scores {
+            background: rgba(66, 104, 88, 0.4);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 24px;
+            border: 1px solid rgba(102, 187, 106, 0.35);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(129, 199, 132, 0.3);
+            margin-bottom: 20px;
+            padding: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .score-submission:hover,
+        .recent-scores:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(129, 199, 132, 0.4);
+            border-color: rgba(102, 187, 106, 0.45);
+        }
+
+        .score-submission h2,
+        .recent-scores h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Player add row */
+        .player-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #playerName {
+            flex: 1 1 auto;
+            max-width: none;
+        }
+
+        #addPlayerBtn {
+            flex: 0 0 auto;
+            height: 42px;
+            min-width: 42px;
+            padding: 0 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(129, 199, 132, 0.5);
+            background: rgba(102, 187, 106, 0.5);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #addPlayerBtn:hover {
+            background: rgba(102, 187, 106, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .section {
+            text-align: center;
+            background: rgba(76, 175, 80, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(102, 187, 106, 0.35);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        label[for="playerName"] {
+            font-weight: 700;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            font-size: 1rem;
+            padding: 12px 16px;
+            box-sizing: border-box;
+            border: 1px solid rgba(102, 187, 106, 0.4);
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            font-weight: 500;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: rgba(129, 199, 132, 0.7);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+            scroll-margin-top: 350px;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .error-message {
+            color: #ff3b30;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            background: rgba(255, 59, 48, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            display: none;
+            min-height: 0;
+        }
+
+        .error-message:not(:empty) {
+            display: block;
+        }
+
+        button[type="submit"] {
+            background: rgba(102, 187, 106, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            border: 1px solid rgba(129, 199, 132, 0.5);
+            border-radius: 16px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        button[type="submit"]:hover {
+            background: rgba(102, 187, 106, 0.6);
+            border-color: rgba(129, 199, 132, 0.7);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        /* Recent scores: player filter */
+        #recentScores { padding-right: 16px; }
+        #recentScores table th:last-child,
+        #recentScores table td:last-child {
+            padding-right: 16px !important;
+            white-space: nowrap;
+        }
+        .player-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 8px 0 12px;
+        }
+        .player-chip {
+            background: rgba(102, 187, 106, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            border: 1px solid rgba(129, 199, 132, 0.5);
+            border-radius: 16px;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .player-chip:hover { transform: translateY(-1px); }
+        .player-chip:focus,
+        .player-chip:active {
+            background: rgba(102, 187, 106, 0.6);
+            outline: none;
+        }
+        .player-chip:focus-visible {
+            outline: 2px solid rgba(129, 199, 132, 0.8);
+            outline-offset: 2px;
+        }
+        td.player-cell { cursor: pointer; }
+        td.player-cell.selected { background: rgba(102, 187, 106, 0.5) !important; }
+
+        /* Grid for header + multiple player rows */
+        .holes-inputs {
+            display: grid;
+            grid-template-columns: 84px repeat(9, 1fr); /* widen player label column to prevent clipping (e.g., 'WWW') */
+            grid-auto-rows: 48px;
+            margin-top: 20px;
+            border: 1px solid rgba(102, 187, 106, 0.4);
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(66, 104, 88, 0.35);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 0 rgba(102, 187, 106, 0.3);
+        }
+
+        .holes-inputs .hole-label {
+            background: rgba(76, 175, 80, 0.5);
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .player-row-label {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* push text near the "x" */
+            gap: 6px; /* a touch more room from the X */
+            font-weight: 400; /* not bold for breathing room */
+            font-size: 0.85rem; /* ~15% smaller than default */
+            color: rgba(255,255,255,0.95);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            user-select: none;
+            white-space: nowrap;
+            padding: 0 8px 0 20px; /* extra left spacer so text never touches edge */
+        }
+
+        .remove-player {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            width: 18px;  /* slightly smaller */
+            height: 18px; /* slightly smaller */
+            border-radius: 50%;
+            line-height: 16px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        /* Style selects within the grid */
+        .holes-inputs select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            text-align: center;
+            text-align-last: center;
+            font-size: 1.2rem;
+            padding: 10px 0;
+            width: 100%;
+            /* Match the score field background */
+            background: rgba(66, 104, 88, 0.35);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            outline: none;
+            cursor: pointer;
+            color: #fff;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border-radius: 0;
+        }
+
+        .holes-inputs select:hover {
+            /* Slightly stronger than base to indicate hover */
+            background: rgba(66, 104, 88, 0.45);
+        }
+
+        .holes-inputs select:focus {
+            outline: 2px solid rgba(129, 199, 132, 0.6);
+            outline-offset: -2px;
+            /* Keep focus background within the same green family */
+            background: rgba(66, 104, 88, 0.55);
+        }
+
+        /* Attempt to style the dropdown menu options where supported */
+        .hole-box select option,
+        .hole-box select optgroup {
+            background-color: rgba(66, 104, 88, 0.95);
+            color: #fff;
+        }
+
+        .hole-box .hole-label { /* legacy selector; keep behavior consistent */
+            background: rgba(76, 175, 80, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 700;
+            padding: 12px 0;
+            border-bottom: none;
+            border-radius: 0;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            grid-row: 1; /* header row */
+        }
+
+        /* Player abbreviation tag at left of score inputs */
+        .player-tag {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            letter-spacing: 0.06em;
+            padding: 0 6px;
+            text-transform: uppercase;
+            user-select: none;
+            white-space: nowrap;
+            grid-row: 2;   /* only on scores row */
+            grid-column: 1;/* left of scores */
+        }
+
+        /* Empty header spacer above player tag (keeps top-left cell empty) */
+        .header-spacer {
+            grid-row: 1;
+            grid-column: 1;
+            /* match header row visual if desired */
+            background: rgba(76, 175, 80, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 0; /* match label height */
+        }
+
+        /* Place selects on the second row of the legacy grid (kept for compatibility) */
+        .hole-box select {
+            grid-row: 2; /* scores row */
+        }
+
+
+
+        #courseMap {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            background: #ffffff;
+            padding: 8px;
+        }
+
+        /* Remove any borders or lines from the course map container */
+        #courseMap {
+            border: none !important;
+        }
+
+        /* Remove border from the div containing the course map */
+        div>img#courseMap {
+            border: none !important;
+        }
+
+        /* Target the container div that wraps the course map */
+        form>div:has(img#courseMap),
+        form>div:not(.section):not(.holes-inputs) {
+            border: none !important;
+            border-bottom: none !important;
+            border-top: none !important;
+            outline: none !important;
+        }
+
+        /* Ensure no border between course map and holes-inputs */
+        .holes-inputs {
+            border-top: none !important;
+        }
+
+        /* Remove any hr elements that might appear */
+        hr {
+            display: none !important;
+        }
+
+        footer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            background: rgba(102, 187, 106, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(129, 199, 132, 0.4);
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        footer a:hover {
+            background: rgba(102, 187, 106, 0.5);
+            border-color: rgba(129, 199, 132, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Style any horizontal rules to match theme */
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.4), transparent);
+            border-radius: 1px;
+            margin: 16px 0;
+            width: 100%;
+        }
+
+        /* Ensure all borders in forms use theme colors */
+        form * {
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        /* Improve visual consistency of hole boxes - ensure borders match theme */
+        .hole-box .hole-label {
+            border-bottom: none !important;
+        }
+
+        .hole-box {
+            border-left: 1px solid rgba(76, 175, 80, 0.25) !important;
+        }
+
+        /* Remove any default browser styling that might cause red/brown colors */
+        .hole-box select::-ms-expand {
+            display: none;
+        }
+
+        .hole-box select::-webkit-appearance {
+            border-radius: 0;
+        }
+
+        /* Enhance the overall appearance */
+        .score-submission {
+            background: rgba(66, 104, 88, 0.45);
+        }
+
+        /* Ensure selects don't have default browser styling that conflicts */
+        .holes-inputs select,
+        .hole-box select {
+            border: none !important;
+        }
+
+        /* Mobile responsive fixes */
+@media screen and (max-width: 768px) {
+    header {
+        padding: 12px 8px;
+        gap: 8px;
+    }
+
+    .header-logo img {
+        height: 40px;
+        max-width: 100px;
+    }
+
+    header nav a {
+        font-size: 0.7rem;
+        letter-spacing: 0.03em;
+    }
+
+    .header-nav-left {
+        padding-right: 6px;
+    }
+
+    .header-nav-right {
+        padding-left: 6px;
+    }
+
+    .header-nav {
+        gap: 8px;
+    }
+
+    main {
+        padding: 0 8px;
+    }
+
+    .score-submission,
+    .recent-scores {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* Prevent any element from causing horizontal scroll */
+body>* {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+img,
+video,
+iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.holes-inputs {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+</style>
+</head>
+
+<body>
+    <header>
+        <nav class="header-nav header-nav-left">
+            <a href="index.html">Scorecard</a>
+        </nav>
+        <div class="header-logo">
+            <img src="logo_white.png" alt="Moss Hill Golf Club"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <h1 style="display: none;">Moss Hill Golf Club</h1>
+        </div>
+        <nav class="header-nav header-nav-right">
+            <a href="data.html">Course Data</a>
+        </nav>
+    </header>
+    <nav aria-label="App version" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:12px;background:#173e31;color:white;font:600 15px sans-serif"><a style="color:white" href="../../index.html" onclick="return confirm('Switch versions? Any unsaved scores will be lost.')">V1 (Classic)</a> <a style="color:white" href="../../v2.html" onclick="return confirm('Switch versions? Any unsaved scores will be lost.')">V2</a> <span aria-current="page">V3 (League)</span></nav>
+
+    <main>
+        <section class="score-submission">
+            <form id="scoreForm">
+                <div class="section" id="overallAveragesSection">
+                    <label for="playerName">PLAYER NAME</label>
+                    <div class="player-input-row">
+                        <input type="text" id="playerName" name="playerName" maxlength="12" placeholder="Enter name" aria-label="Player name">
+                        <button type="button" id="addPlayerBtn" title="Add player">+</button>
+                    </div>
+                </div>
+
+                <!-- Course map -->
+                <div>
+                    <img id="courseMap" src="assets/all.png" alt="course map"
+                        style="width: 100%; height: auto; max-height: 300px; object-fit: contain; display: block;" />
+                </div>
+
+                <!-- Dynamic grid for header and player rows -->
+                <div class="holes-inputs" id="holesGrid" aria-live="polite"></div>
+
+
+                <div class="error-message" id="errorMessage"></div>
+                <button type="submit">SUBMIT SCORE</button>
+            </form>
+        </section>
+
+        <!-- <section class="recent-scores">
+            <h2>Leaderboard</h2>
+            <div id="Leaderboard"></div>
+        </section>
+
+        <section class="recent-scores">
+            <h2>Recent Scores</h2>
+            <div id="recentScores"></div>
+        </section> -->
+    </main>
+
+    <!-- <footer>
+        <p><a href="data.html">View Averages</a></p>
+    </footer> -->
+
+    <script>
+        document.querySelectorAll('input[type="number"]').forEach((input) => {
+            input.addEventListener('focus', () => {
+                const inputOffset = input.getBoundingClientRect().top + window.pageYOffset - 200; // Adjust 200px above
+                window.scrollTo({
+                    top: inputOffset,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const errorMessage = document.getElementById('errorMessage');
+            const scoreForm = document.getElementById('scoreForm');
+            const recentScoresDiv = document.getElementById('recentScores');
+            const courseMap = document.getElementById('courseMap');
+            const holesGrid = document.getElementById('holesGrid');
+            const playerNameInput = document.getElementById('playerName');
+            const addPlayerBtn = document.getElementById('addPlayerBtn');
+            let selectedPlayerFilter = '';
+
+            const MAX_PLAYERS = 6;
+            let activePlayerIndex = -1;
+            let players = [];
+
+            const abbrFrom = (name) => (name || '').trim().slice(0, 3).toUpperCase();
+
+            function setError(msg) {
+                if (!errorMessage) return;
+                if (msg) {
+                    errorMessage.textContent = msg;
+                    errorMessage.style.display = 'block';
+                } else {
+                    errorMessage.textContent = '';
+                    errorMessage.style.display = 'none';
+                }
+            }
+
+            function saveLocal() {
+                const data = players.map(p => ({ name: p.name, scores: p.scores }));
+                localStorage.setItem('scorecardPlayers', JSON.stringify(data));
+            }
+
+            function loadLocal() {
+                const raw = localStorage.getItem('scorecardPlayers');
+                if (!raw) return;
+                try {
+                    const data = JSON.parse(raw);
+                    if (Array.isArray(data)) {
+                        players = data.map(d => ({ name: (d.name || '').slice(0,12), abbr: abbrFrom(d.name), scores: Array.isArray(d.scores) ? d.scores.slice(0,9).map(v => (v || '')) : Array(9).fill('') }));
+                        if (players.length) activePlayerIndex = 0;
+                    }
+                } catch {}
+            }
+
+            function updateCourseMapFor(index) {
+                if (index < 0 || index >= players.length) {
+                    courseMap.src = 'assets/all.png';
+                    return;
+                }
+                const scores = players[index].scores;
+                let firstUnselected = scores.findIndex(v => !v);
+                if (firstUnselected === -1) {
+                    courseMap.src = 'assets/all.png';
+                } else {
+                    courseMap.src = `assets/${firstUnselected + 1}.png`;
+                }
+            }
+
+            function makeHoleSelect(playerIdx, holeIdx) {
+                const sel = document.createElement('select');
+                sel.required = true;
+                const empty = document.createElement('option');
+                empty.value = '';
+                empty.disabled = true;
+                empty.selected = !players[playerIdx].scores[holeIdx];
+                empty.textContent = '--';
+                sel.appendChild(empty);
+                for (let v = 1; v <= 5; v++) {
+                    const opt = document.createElement('option');
+                    opt.value = String(v);
+                    opt.textContent = String(v);
+                    if (players[playerIdx].scores[holeIdx] == String(v)) opt.selected = true;
+                    sel.appendChild(opt);
+                }
+                sel.addEventListener('change', () => {
+                    players[playerIdx].scores[holeIdx] = sel.value;
+                    saveLocal();
+                    updateCourseMapFor(playerIdx);
+                });
+                sel.addEventListener('focus', () => {
+                    activePlayerIndex = playerIdx;
+                    updateCourseMapFor(playerIdx);
+                });
+                return sel;
+            }
+
+            function renderGrid() {
+                // Hide when no players
+                if (!players.length) {
+                    holesGrid.style.display = 'none';
+                    holesGrid.innerHTML = '';
+                    courseMap.src = 'assets/all.png';
+                    return;
+                }
+                holesGrid.style.display = 'grid';
+                holesGrid.innerHTML = '';
+
+                // Header row
+                const spacer = document.createElement('div');
+                spacer.className = 'hole-label header-spacer';
+                holesGrid.appendChild(spacer); // left empty
+                for (let i = 1; i <= 9; i++) {
+                    const hl = document.createElement('div');
+                    hl.className = 'hole-label';
+                    hl.textContent = String(i);
+                    holesGrid.appendChild(hl);
+                }
+
+                // Player rows
+                players.forEach((p, idx) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'player-row-label';
+                    const label = document.createElement('span');
+                    label.textContent = p.abbr || '---';
+                    label.title = p.name || '';
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'remove-player';
+                    remove.title = 'Remove player';
+                    remove.textContent = '\u00D7';
+                    remove.addEventListener('click', () => {
+                        players.splice(idx, 1);
+                        if (activePlayerIndex >= players.length) activePlayerIndex = players.length - 1;
+                        saveLocal();
+                        renderGrid();
+                        updateCourseMapFor(activePlayerIndex);
+                        // Re-enable add button if it was disabled
+                        addPlayerBtn.disabled = players.length >= MAX_PLAYERS;
+                    });
+                    tag.appendChild(label);
+                    tag.appendChild(remove);
+                    holesGrid.appendChild(tag);
+
+                    for (let h = 0; h < 9; h++) {
+                        holesGrid.appendChild(makeHoleSelect(idx, h));
+                    }
+                });
+
+                // Ensure add button disabled state respects max
+                addPlayerBtn.disabled = players.length >= MAX_PLAYERS;
+            }
+
+            function addPlayer() {
+                const name = (playerNameInput.value || '').trim().slice(0, 12);
+                if (!name) {
+                    setError('Enter a player name first.');
+                    return;
+                }
+                if (players.length >= MAX_PLAYERS) {
+                    setError(`Maximum of ${MAX_PLAYERS} players reached.`);
+                    return;
+                }
+                setError('');
+                const player = { name, abbr: abbrFrom(name), scores: Array(9).fill('') };
+                players.push(player);
+                activePlayerIndex = players.length - 1;
+                saveLocal();
+                playerNameInput.value = '';
+                renderGrid();
+                updateCourseMapFor(activePlayerIndex);
+            }
+
+            // Wire up add button and enforce maxlength during typing
+            addPlayerBtn?.addEventListener('click', addPlayer);
+            playerNameInput?.addEventListener('input', () => {
+                if (playerNameInput.value.length > 12) {
+                    playerNameInput.value = playerNameInput.value.slice(0, 12);
+                }
+            });
+            // Pressing Enter in the name field adds a player instead of submitting the form
+            playerNameInput?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addPlayer();
+                }
+            });
+
+            // Submit handler: send one POST per player
+            scoreForm?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                setError('');
+                if (!players.length) {
+                    setError('Add at least one player.');
+                    return;
+                }
+                // Validate all players
+                for (const p of players) {
+                    if (p.scores.some(v => !v)) {
+                        setError(`Please complete all 9 holes for ${p.name}.`);
+                        return;
+                    }
+                }
+                try {
+                    for (const p of players) {
+                        const params = new URLSearchParams();
+                        for (let i = 0; i < 9; i++) params.append(`hole${i+1}`, String(p.scores[i]));
+                        params.append('playerName', p.name);
+                        params.append('action', 'submit_score');
+                        const res = await fetch('server.py', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: params
+                        });
+                        const txt = await res.text();
+                        if (txt.trim() !== 'success') throw new Error('submit failed');
+                    }
+                    // Reset after success
+                    players = [];
+                    activePlayerIndex = -1;
+                    saveLocal();
+                    renderGrid();
+                    setError('');
+                    if (typeof loadRecentScores === 'function') {
+                        try { await loadRecentScores(); } catch {}
+                    }
+                } catch (err) {
+                    setError('Error submitting score.');
+                }
+            });
+
+            // Recent scores loader (kept compatible if element exists)
+            async function loadRecentScores() {
+                if (!recentScoresDiv) return;
+                const response = await fetch('server.py?action=get_recent_scores');
+                const text = await response.text();
+                const lines = text.trim().split('\n').filter(line => line);
+                recentScoresDiv.innerHTML = '';
+
+                // Build player filter bar
+                const playersSet = new Set();
+                lines.forEach(line => {
+                    const parts = line.split(',');
+                    const p = parts[10];
+                    if (p) playersSet.add(p);
+                });
+                const filterBar = document.createElement('div');
+                filterBar.className = 'player-filter-bar';
+                const clearBtn = document.createElement('button');
+                clearBtn.type = 'button';
+                clearBtn.className = 'player-chip';
+                clearBtn.textContent = selectedPlayerFilter ? 'Show All' : 'All Players';
+                clearBtn.addEventListener('click', () => { selectedPlayerFilter = ''; loadRecentScores(); });
+                filterBar.appendChild(clearBtn);
+                Array.from(playersSet).sort().forEach(p => {
+                    const chip = document.createElement('button');
+                    chip.type = 'button';
+                    chip.className = 'player-chip';
+                    chip.textContent = p;
+                    if (selectedPlayerFilter === p) chip.style.outline = '2px solid rgba(129, 199, 132, 0.8)';
+                    chip.addEventListener('click', () => { selectedPlayerFilter = p; loadRecentScores(); });
+                    filterBar.appendChild(chip);
+                });
+                recentScoresDiv.appendChild(filterBar);
+
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                const headers = ['Holes', 'Total', 'Date', 'Player'];
+                headers.forEach(h => {
+                    const th = document.createElement('th');
+                    th.textContent = h;
+                    th.style.textAlign = 'left';
+                    th.style.whiteSpace = 'nowrap';
+                    if (h === 'Player') { th.style.paddingRight = '8px'; th.style.minWidth = '0'; }
+                    th.style.borderBottom = '1px solid #ccc';
+                    th.style.padding = '8px';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+
+                const tbody = document.createElement('tbody');
+
+                lines.reverse().forEach(line => {
+                    const parts = line.split(',');
+                    // [datetime, hole1..hole9, player]
+                    const datetime = parts[0];
+                    const holes = parts.slice(1, 10);
+                    const player = parts[10];
+                    if (selectedPlayerFilter && player !== selectedPlayerFilter) return;
+                    const total = holes.reduce((sum, h) => sum + parseInt(h), 0);
+
+                    const [datePart] = datetime.split(' ');
+                    const [year, month, day] = datePart.split('-');
+                    const shortYear = year.slice(-2);
+                    const formattedDate = `${month}/${day}/${shortYear}`;
+
+                    const row = document.createElement('tr');
+
+                    const holesCell = document.createElement('td');
+                    holesCell.textContent = holes.join(' ');
+                    holesCell.style.padding = '8px';
+                    row.appendChild(holesCell);
+
+                    const totalCell = document.createElement('td');
+                    totalCell.textContent = total;
+                    totalCell.style.padding = '8px';
+                    row.appendChild(totalCell);
+
+                    const dateCell = document.createElement('td');
+                    dateCell.textContent = formattedDate;
+                    dateCell.style.padding = '8px';
+                    row.appendChild(dateCell);
+
+                    const playerCell = document.createElement('td');
+                    playerCell.textContent = player;
+                    playerCell.style.padding = '8px';
+                    playerCell.style.textAlign = 'left';
+                    playerCell.className = 'player-cell';
+                    playerCell.title = 'Click to filter by this player';
+                    playerCell.addEventListener('click', () => { selectedPlayerFilter = player; loadRecentScores(); });
+                    if (selectedPlayerFilter && player === selectedPlayerFilter) playerCell.classList.add('selected');
+                    row.appendChild(playerCell);
+
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(thead);
+                table.appendChild(tbody);
+                recentScoresDiv.appendChild(table);
+            }
+
+            // Initialize from localStorage and render
+            loadLocal();
+            renderGrid();
+            updateCourseMapFor(activePlayerIndex);
+
+
+            // Load the leaderboard
+            async function loadLeaderboard() {
+                const response = await fetch('server.py?action=get_leaderboard');
+                const text = await response.text();
+                const lines = text.trim().split('\n').filter(line => line);
+
+                const leaderboardDiv = document.getElementById('Leaderboard');
+                leaderboardDiv.innerHTML = '';
+
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                const headers = ['Holes', 'Total', 'Date', 'Player'];
+                headers.forEach(h => {
+                    const th = document.createElement('th');
+                    th.textContent = h;
+                    th.style.textAlign = 'left';
+                    th.style.borderBottom = '1px solid #ccc';
+                    th.style.padding = '8px';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+
+                const tbody = document.createElement('tbody');
+
+                lines.forEach((line, index) => {
+                    const parts = line.split(',');
+                    if (parts.length < 12) return;
+
+                    const datetime = parts[0];
+                    const holes = parts.slice(1, 10);
+                    const total = parts[10];
+                    const player = parts[11];
+
+                    const [datePart] = datetime.split(' ');
+                    const [year, month, day] = datePart.split('-');
+                    const shortYear = year.slice(-2);
+                    const formattedDate = `${month}/${day}/${shortYear}`;
+
+                    const row = document.createElement('tr');
+
+                    const holesCell = document.createElement('td');
+                    holesCell.textContent = holes.join(' ');
+                    holesCell.style.padding = '8px';
+                    row.appendChild(holesCell);
+
+                    const totalCell = document.createElement('td');
+                    totalCell.textContent = total;
+                    totalCell.style.padding = '8px';
+                    row.appendChild(totalCell);
+
+                    const dateCell = document.createElement('td');
+                    dateCell.textContent = formattedDate;
+                    dateCell.style.padding = '8px';
+                    row.appendChild(dateCell);
+
+                    const playerCell = document.createElement('td');
+                    playerCell.textContent = player;
+                    playerCell.style.padding = '8px';
+                    row.appendChild(playerCell);
+
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(thead);
+                table.appendChild(tbody);
+                leaderboardDiv.appendChild(table);
+            }
+            loadLeaderboard();
+        });
+    </script>
+</body>
+
+</html>

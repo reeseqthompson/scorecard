@@ -12,6 +12,7 @@ function showView(view){ if(view==='map'){let active=document.querySelector('.vi
 document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>showView(el.dataset.view)));
 $('#menuButton').onclick=()=>{$('#finishRound').hidden=!players.length;setMenu(true)};
 $('#backdrop').onclick=()=>{setMenu(false)};
+['#classicVersion','#leagueVersion'].forEach(selector=>{$(selector).onclick=()=>!players.some(player=>!player.saved) || confirm('Switch versions? Any unsaved scores will be lost.');});
 $('#finishRound').onclick=()=>{if(!confirm('Finish this round? Unsaved scores will be lost.'))return;players=[];setupNames=[];currentPlayer=0;hole=0;renderSetup();setMenu(false);showView('home')};
 $('#mapButton').onclick=()=>showView('map');
 $('#mapBack').onclick=()=>showView(mapOrigin);

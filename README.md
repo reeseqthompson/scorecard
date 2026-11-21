@@ -39,9 +39,14 @@ http://192.168.x.x:3001/v2.html
 
 - **V2:** Open `/v2.html` for the mobile-friendly interface, group rounds,
   playing history, and statistics.
-- **Classic View:** Open `/`, or select **Classic View** from the V2 menu.
+- **V1 (Classic):** Open `/`, or select **V1 (Classic)** from the V2 menu.
+- **V3 (Basement Golf League):** Open `/v3/index.html` for the league site,
+  Moss Hill scorecard, and course designer.
+- Use the version links in each interface to switch between them. Switching versions leaves
+  the current page, so save any in-progress round first.
 
-Both versions use the same server and score data.
+All three versions use the same server and Moss Hill score data. The course
+designer has separate device and HTTPS requirements; see its README.
 
 ## Add V2 to an iPhone Home Screen
 

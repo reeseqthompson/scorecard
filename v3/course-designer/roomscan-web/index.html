@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111" />
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./style.css" />
+  <title>RoomScan Web</title>
+</head>
+<body>
+  <div id="ui" class="overlay">
+    <div class="row">
+      <button id="autoWalls">Auto Walls: Off</button>
+      <button id="doorBtn">Door</button>
+      <button id="windowBtn">Window</button>
+      <button id="finishBtn">Finish</button>
+      <button id="exportBtn">Export</button>
+    </div>
+    <div id="status"></div>
+    <canvas id="plan2d" width="280" height="220" title="2D Preview"></canvas>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.158.0/build/three.module.js';
+    import { ARButton } from 'https://unpkg.com/three@0.158.0/examples/jsm/webxr/ARButton.js';
+    import { FloorPlanBuilder, Opening } from './geometry.js';
+    import { exportSVG, exportJSON } from './export.js';
+
+    const statusEl = document.getElementById('status');
+    const autoWallsBtn = document.getElementById('autoWalls');
+    const doorBtn = document.getElementById('doorBtn');
+    const windowBtn = document.getElementById('windowBtn');
+    const finishBtn = document.getElementById('finishBtn');
+    const exportBtn = document.getElementById('exportBtn');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera();
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.xr.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    let xrRefSpace = null;
+    let hitTestSource = null;
+    let reticle = null;
+    let session = null;
+    let placing = null; // 'door' | 'window' | null
+    let scanningFinished = false;
+    let autoWalls = false;
+    const builder = new FloorPlanBuilder();
+    const planCanvas = document.getElementById('plan2d');
+    const planCtx = planCanvas.getContext('2d');
+    let depthWorker = new Worker('./depth-worker.js');
+    let lastAutoRun = 0;
+    let pendingAuto = false;
+
+    depthWorker.onmessage = (e) => {
+      const { segments } = e.data || {};
+      if (Array.isArray(segments)) {
+        for (const s of segments) {
+          builder.updateWithSegment({ a: { x: s.x1, y: s.y1 }, b: { x: s.x2, y: s.y2 } });
+        }
+        redrawPlan();
+      }
+      pendingAuto = false;
+    };
+
+    // Reticle
+    reticle = new THREE.Mesh(
+      new THREE.RingGeometry(0.05, 0.06, 32).rotateX(-Math.PI / 2),
+      new THREE.MeshBasicMaterial({ color: 0x00ffff })
+    );
+    reticle.matrixAutoUpdate = false;
+    reticle.visible = false;
+    scene.add(reticle);
+
+    // AR button
+    const sessionInit = {
+      requiredFeatures: ['hit-test', 'local-floor'],
+      optionalFeatures: ['dom-overlay', 'anchors', 'depth-sensing'],
+      domOverlay: { root: document.body },
+      depthSensing: { usagePreference: ['cpu-optimized'], dataFormatPreference: ['luminance-alpha'] }
+    };
+    const arButton = ARButton.createButton(renderer, sessionInit);
+    document.body.appendChild(arButton);
+
+    // UI handlers
+    autoWallsBtn.addEventListener('click', () => {
+      autoWalls = !autoWalls;
+      autoWallsBtn.textContent = `Auto Walls: ${autoWalls ? 'On' : 'Off'}`;
+    });
+    doorBtn.addEventListener('click', () => {
+      placing = placing === 'door' ? null : 'door';
+      toast(`Door placement: ${placing === 'door'}`);
+    });
+    windowBtn.addEventListener('click', () => {
+      placing = placing === 'window' ? null : 'window';
+      toast(`Window placement: ${placing === 'window'}`);
+    });
+    finishBtn.addEventListener('click', () => {
+      scanningFinished = true;
+      toast('Scanning finished.');
+    });
+    exportBtn.addEventListener('click', () => {
+      const svg = exportSVG(builder.getWalls(), builder.getDoors(), builder.getWindows());
+      downloadFile('floorplan.svg', svg, 'image/svg+xml');
+      const json = exportJSON(builder.getWalls(), builder.getDoors(), builder.getWindows());
+      downloadFile('floorplan.json', json, 'application/json');
+    });
+
+    // Read URL params to preconfigure
+    (function () {
+      const url = new URL(window.location.href);
+      const aw = url.searchParams.get('autowalls') || url.hash.match(/autowalls=([01truefals]+)/i)?.[1];
+      if (aw && /^(1|true)$/i.test(String(aw))) {
+        autoWalls = true;
+        autoWallsBtn.textContent = 'Auto Walls: On';
+      }
+    })();
+
+    // Enter AR lifecycle
+    renderer.xr.addEventListener('sessionstart', async () => {
+      session = renderer.xr.getSession();
+      xrRefSpace = await session.requestReferenceSpace('local-floor');
+      const viewerSpace = await session.requestReferenceSpace('viewer');
+      const hitTestSourceReq = await session.requestHitTestSource({ space: viewerSpace });
+      hitTestSource = hitTestSourceReq;
+      setStatus('Move device to detect surfaces.');
+
+      // Controller for taps
+      const controller = renderer.xr.getController(0);
+      controller.addEventListener('select', onSelect);
+      scene.add(controller);
+    });
+
+    renderer.setAnimationLoop(renderXR);
+
+    function renderXR(time, frame) {
+      if (!frame || !xrRefSpace) { renderer.render(scene, camera); return; }
+
+      const session = frame.session;
+      const pose = frame.getViewerPose(xrRefSpace);
+      if (!pose) { renderer.render(scene, camera); return; }
+
+      // Hit test to place reticle on real surfaces
+      if (hitTestSource) {
+        const hits = frame.getHitTestResults(hitTestSource);
+        if (hits.length > 0) {
+          const hit = hits[0];
+          const mat = new THREE.Matrix4().fromArray(hit.getPose(xrRefSpace).transform.matrix);
+          reticle.visible = true;
+          reticle.matrix = mat;
+        } else {
+          reticle.visible = false;
+        }
+      }
+
+      if (!scanningFinished) {
+        if (autoWalls) tryAutoWalls(frame);
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    function onSelect(event) {
+      if (!reticle.visible) { toast('Aim at a surface'); return; }
+      const mat = reticle.matrix.clone();
+      const pos = new THREE.Vector3().setFromMatrixPosition(mat);
+      const x = pos.x; const z = pos.z; // world meters
+      if (placing === 'door') {
+        builder.addOpening(Opening.DOOR, { x, y: z });
+        toast('Door added');
+        redrawPlan();
+      } else if (placing === 'window') {
+        builder.addOpening(Opening.WINDOW, { x, y: z });
+        toast('Window added');
+        redrawPlan();
+      } else {
+        // Manual wall tracing: create segments between consecutive taps
+        builder.addTracePoint({ x, y: z });
+        toast('Point added');
+        redrawPlan();
+      }
+    }
+
+    function tryAutoWalls(frame) {
+      if (pendingAuto) return; // don't overwhelm worker
+      const now = performance.now();
+      if (now - lastAutoRun < 600) return; // throttle ~1.6 Hz
+      const xrCam = renderer.xr.getCamera(camera);
+      const baseCam = xrCam; // three.js WebXR camera wrapper
+      let depthInfo = frame.getDepthInformation?.(xrCam) || null;
+      if (!depthInfo && xrCam && 'camera' in xrCam) depthInfo = frame.getDepthInformation?.(xrCam.camera) || null;
+      if (!depthInfo && xrCam && Array.isArray(xrCam.cameras) && xrCam.cameras.length) depthInfo = frame.getDepthInformation?.(xrCam.cameras[0]) || null;
+      if (!depthInfo) return;
+
+      // Sample a sparse grid from depth, convert to world XZ points
+      const w = depthInfo.width, h = depthInfo.height;
+      const samplesX = 28, samplesY = 20;
+      const invProj = new THREE.Matrix4().copy(baseCam.projectionMatrix).invert();
+      const worldMat = new THREE.Matrix4().copy(baseCam.matrixWorld);
+      const camPos = new THREE.Vector3().setFromMatrixPosition(worldMat);
+      const worldDir = (nx, ny) => {
+        const clip = new THREE.Vector4(nx, ny, -1, 1).applyMatrix4(invProj);
+        clip.z = -1; clip.w = 0; // direction in view space
+        const dir = new THREE.Vector3(clip.x, clip.y, clip.z).applyMatrix4(worldMat).sub(camPos).normalize();
+        return dir;
+      };
+      const pts = [];
+      for (let iy = 1; iy < samplesY; iy++) {
+        for (let ix = 1; ix < samplesX; ix++) {
+          const u = Math.floor(ix * w / samplesX);
+          const v = Math.floor(iy * h / samplesY);
+          const d = depthInfo.getDepth(u, v);
+          if (!isFinite(d) || d <= 0.2 || d > 8.0) continue;
+          const nx = (u / w) * 2 - 1;
+          const ny = -((v / h) * 2 - 1);
+          const dir = worldDir(nx, ny);
+          const worldPoint = new THREE.Vector3().copy(camPos).addScaledVector(dir, d);
+          // Keep points near vertical surfaces: approximate by rejecting points near floor (y below camera by >0.7m)
+          if (worldPoint.y < camPos.y - 0.7) continue;
+          pts.push(worldPoint.x, worldPoint.z);
+        }
+      }
+      if (pts.length < 60) return;
+      pendingAuto = true;
+      lastAutoRun = now;
+      const arr = new Float32Array(pts);
+      depthWorker.postMessage({ type: 'points', points: arr, eps: 0.08, iterations: 240, minInliers: 30 }, [arr.buffer]);
+    }
+
+    function downloadFile(name, content, mime) {
+      const blob = new Blob([content], { type: mime });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+    function toast(msg) { setStatus(msg); }
+
+    function redrawPlan() {
+      const walls = builder.getWalls();
+      const doors = builder.getDoors();
+      const windows = builder.getWindows();
+      const pad = 10;
+      // compute bounds
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      const add = (p) => { minX = Math.min(minX, p.x); minY = Math.min(minY, p.y); maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); };
+      walls.forEach(w => { add(w.a); add(w.b); });
+      doors.forEach(o => add(o.center));
+      windows.forEach(o => add(o.center));
+      if (!isFinite(minX)) { minX = 0; minY = 0; maxX = 1; maxY = 1; }
+      const wPx = planCanvas.width, hPx = planCanvas.height;
+      const scale = Math.min((wPx - 2*pad) / (maxX - minX || 1), (hPx - 2*pad) / (maxY - minY || 1));
+      const tx = pad - minX * scale;
+      const ty = pad - minY * scale;
+
+      planCtx.clearRect(0, 0, wPx, hPx);
+      // walls
+      planCtx.strokeStyle = '#fff';
+      planCtx.lineWidth = 3;
+      planCtx.lineCap = 'round';
+      for (const w of walls) {
+        planCtx.beginPath();
+        planCtx.moveTo(w.a.x * scale + tx, w.a.y * scale + ty);
+        planCtx.lineTo(w.b.x * scale + tx, w.b.y * scale + ty);
+        planCtx.stroke();
+      }
+      // doors green
+      planCtx.strokeStyle = '#2e7d32';
+      planCtx.lineWidth = 2;
+      for (const d of doors) {
+        const half = (d.widthMeters || 0.9) * scale / 2;
+        planCtx.beginPath();
+        planCtx.moveTo(d.center.x * scale + tx - half, d.center.y * scale + ty);
+        planCtx.lineTo(d.center.x * scale + tx + half, d.center.y * scale + ty);
+        planCtx.stroke();
+      }
+      // windows blue
+      planCtx.strokeStyle = '#1565c0';
+      for (const w of windows) {
+        const half = (w.widthMeters || 0.9) * scale / 2;
+        planCtx.beginPath();
+        planCtx.moveTo(w.center.x * scale + tx - half, w.center.y * scale + ty);
+        planCtx.lineTo(w.center.x * scale + tx + half, w.center.y * scale + ty);
+        planCtx.stroke();
+      }
+    }
+
+    // initial clear
+    redrawPlan();
+
+    // PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
+</body>
+</html>
