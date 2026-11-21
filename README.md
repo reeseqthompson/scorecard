@@ -41,7 +41,7 @@ http://192.168.x.x:3001/
   playing history, and statistics. Existing `/v2.html` links continue to work.
 - **V1 (Classic):** Open `/v1`, or select **V1 (Classic)** from the V2 menu.
 - **Basement Golf League:** Open `/v3/index.html` for the league homepage and
-  course designer. The league homepage links to the classic scorecard.
+  course designer. The league homepage links to the default scorecard.
 
 Both scorecard versions use the same server and Moss Hill score data. Save any
 in-progress round before switching interfaces. The course designer has separate
