@@ -71,8 +71,15 @@ class SimpleRequestHandler(http.server.BaseHTTPRequestHandler):
 
         else:
             # Serve static files (including edit_scores.html if requested)
-            if parsed_path.path == '/':
+            if parsed_path.path in ('/', '/v2.html'):
                 file_path = 'index.html'
+            elif parsed_path.path == '/v1':
+                file_path = 'v1.html'
+            elif parsed_path.path == '/v1/':
+                self.send_response(301)
+                self.send_header('Location', '/v1')
+                self.end_headers()
+                return
             else:
                 file_path = parsed_path.path.strip('/')
 

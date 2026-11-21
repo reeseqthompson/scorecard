@@ -25,32 +25,31 @@ python3 server.py
 On the same computer, open:
 
 ```text
-http://localhost:3001/v2.html
+http://localhost:3001/
 ```
 
 From another device on the same network, replace `localhost` with the
 server computer’s IP address. For example:
 
 ```text
-http://192.168.x.x:3001/v2.html
+http://192.168.x.x:3001/
 ```
 
 ## Choose a version
 
-- **V2:** Open `/v2.html` for the mobile-friendly interface, group rounds,
-  playing history, and statistics.
-- **V1 (Classic):** Open `/`, or select **V1 (Classic)** from the V2 menu.
-- **V3 (Basement Golf League):** Open `/v3/index.html` for the league site,
-  Moss Hill scorecard, and course designer.
-- Use the version links in each interface to switch between them. Switching versions leaves
-  the current page, so save any in-progress round first.
+- **V2:** Open `/` for the default mobile-friendly interface, group rounds,
+  playing history, and statistics. Existing `/v2.html` links continue to work.
+- **V1 (Classic):** Open `/v1`, or select **V1 (Classic)** from the V2 menu.
+- **Basement Golf League:** Open `/v3/index.html` for the league homepage and
+  course designer. The league homepage links to the classic scorecard.
 
-All three versions use the same server and Moss Hill score data. The course
-designer has separate device and HTTPS requirements; see its README.
+Both scorecard versions use the same server and Moss Hill score data. Save any
+in-progress round before switching interfaces. The course designer has separate
+device and HTTPS requirements; see its README.
 
 ## Add V2 to an iPhone Home Screen
 
-1. Open `/v2.html` in Safari on your iPhone.
+1. Open `/` in Safari on your iPhone.
 2. Tap **Share**, then **Add to Home Screen**.
 3. Open Moss Hill from the new Home Screen icon.
 
